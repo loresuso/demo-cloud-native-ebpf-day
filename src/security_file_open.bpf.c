@@ -25,6 +25,9 @@ int BPF_PROG(handle_security_file_open, struct file *file)
 {
     struct security_file_open_event *event;
     struct path path;
+    struct inode *inode;
+    struct super_block *sb;
+    unsigned long magic;
 
     event = bpf_ringbuf_reserve(&rb, sizeof(struct security_file_open_event), 0);
     if(!event)
@@ -38,7 +41,10 @@ int BPF_PROG(handle_security_file_open, struct file *file)
     bpf_d_path(&file->f_path, event->path, MAX_FILENAME);
     bpf_core_read(&event->flags, sizeof(file->f_flags), (void *)&file->f_flags);
     bpf_core_read(&event->flags, sizeof(file->f_mode), (void *)&file->f_mode);
-
+    bpf_core_read(&inode, sizeof(inode), (void *)&file->f_inode);
+    bpf_core_read(&sb, sizeof(sb), (void *)&inode->i_sb);
+    bpf_core_read(&magic, sizeof(magic), &sb->s_magic);
+    event->is_overlay = (magic == OVERLAYFS_SUPER_MAGIC ? true : false);
     bpf_ringbuf_submit(event, 0);
 
     return 0;

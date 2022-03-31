@@ -1,6 +1,8 @@
 #define MAX_FILENAME 128
 #define MAX_COMM 32
 
+#define OVERLAYFS_SUPER_MAGIC 0x794c7630
+
 enum event_type 
 {
     SECURITY_FILE_OPEN,
@@ -20,6 +22,7 @@ struct security_file_open_event
     char path[MAX_FILENAME];
     uint32_t flags;
     uint32_t mode;
+    bool is_overlay;
 };
 
 struct security_file_mprotect_event

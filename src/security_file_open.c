@@ -12,7 +12,7 @@ void handle_file_mprotect(struct security_file_mprotect_event *event);
 int handle_event(void *ctx, void *data, size_t data_sz)
 {
 	const struct header *hdr = data;
-    if(!strcmp("test", hdr->comm))
+    if(!strcmp("id", hdr->comm))
     {
         
         switch(hdr->type)
@@ -31,7 +31,8 @@ int handle_event(void *ctx, void *data, size_t data_sz)
 }
 
 void handle_file_open(struct security_file_open_event *e){
-    printf("filename: %s, mode: %x, flags: %x\n", e->path, e->mode, e->flags);
+    printf("filename: %s, mode: %x, flags: %x\n, is_overlay: %s\n", 
+        e->path, e->mode, e->flags, e->is_overlay ? "true" : "false");
 }
 
 void handle_file_mprotect(struct security_file_mprotect_event *e)
